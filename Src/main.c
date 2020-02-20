@@ -92,6 +92,11 @@
 #define I_GAIN_RIGHT_CCW		0//.005
 #define D_GAIN_RIGHT_CCW	0.0008
 
+#define P_GAIN_ANGLE	0.25//.8//.5
+#define I_GAIN_ANGLE	0.25//.8//.5
+#define D_GAIN_ANGLE	0.25//.8//.5
+
+
 #define VELOCITY2DUTYGAIN_RIGHT 48.5627//53.55061536
 #define VELOCITY2DUTYGAIN_LEFT 49.2432//54.15061536
 
@@ -453,7 +458,10 @@ void DC_PID_Speed_Ctrl(){
 		*/
 		
 		
-	AngleGoal += 180*0.001*(motor_R.speed_Ctrl - motor_L.speed_Ctrl) / (LENGTH/1000.0)/PI;
+	//AngleGoal += 180*0.001*(motor_R.speed_Ctrl - motor_L.speed_Ctrl) / (LENGTH/1000.0)/PI;
+//	if(AngleGoal >180) AngleGoal -=360;
+//	else if(AngleGoal <-180) AngleGoal +=360;
+	AngleGoal += 180*0.001*(motor_R.speed- motor_L.speed) / (LENGTH/1000.0)/PI;
 	if(AngleGoal >180) AngleGoal -=360;
 	else if(AngleGoal <-180) AngleGoal +=360;
 	
@@ -462,13 +470,12 @@ void DC_PID_Speed_Ctrl(){
 	//AngularSpeed_Err = (AngularSpeed_Goal - AngularSpeed_Sensor)/10;
 	//AngularSpeed_Err =0;3
 	//허용 각도오차 0.2deg
-	AngleErr = AngleGoal + AngleSensor;
+	AngleErr = AngleGoal + AngleSensor;		//AngleGoal과 AngleSensor의 방향이 반대, AngleSensor는 시계방향 각도
 	if(AngleErr > 180)  AngleErr -=360;
 	else if(AngleErr<-180) AngleErr +=360;
 
 	//(fabs(AngleErr)>20 ? sgn(AngleErr)*20 : AngleErr);
 	//AngleErr=0;
-	
 	motor_R.speed_Err = (motor_R.speed_Ctrl+(fabs(AngleErr)>20 ? sgn(AngleErr)*20 : AngleErr)/10.0- motor_R.speed);
 	motor_L.speed_Err = (motor_L.speed_Ctrl-(fabs(AngleErr)>20 ? sgn(AngleErr)*20 : AngleErr)/10.0 - motor_L.speed) ;
 	
